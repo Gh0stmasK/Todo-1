@@ -15,6 +15,9 @@
 body {
   background-color: var(--background);
   color: var(--text);
+  margin: 10px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 10px;
 }
 
 .container {
@@ -146,4 +149,36 @@ button {
   height: 24px;
   cursor: pointer;
   margin: 0 10px;
+}
+
+.taskItem img:hover{
+  transform: scale(1.1);
+  transition: all 0.2s ease;
+}
+
+.taskItem img:active{
+  transform: scale(0.9);
+  transition: all 0.1s ease;
+}
+
+@media (max-width: 600px){
+  .container{
+    margin: 30px auto 0 auto;
+    padding: 0 10px;
+  }
+
+  .stats-container{
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  .details{
+    text-align: center;
+  }
+
+  #numbers{
+    height: 80px;
+    width: 80px;
+    font-size: 24px;
+  }
 }
