@@ -136,6 +136,9 @@ button {
 .task p {
   font-size: 18px;
   color: var(--text);
+  word-break: break-all;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .completed p {
