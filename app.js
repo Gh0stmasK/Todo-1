@@ -10,6 +10,9 @@ document.addEventListener("DOMContentLoaded", () => {
 let task = [];
 let editingIndex = null;
 
+const taskInputElement = document.getElementById("taskInput");
+const defaultPlaceholder = taskInputElement ? taskInputElement.placeholder : "Write your task";
+
 const saveTasks = () => {
     localStorage.setItem("task", JSON.stringify(task));
 };
@@ -23,6 +26,7 @@ const addTask = () => {
         task[editingIndex].text = text;
         editingIndex = null;
         document.getElementById("newTask").textContent = "+";
+        taskInput.placeholder = defaultPlaceholder;
     } else {
         task.push({ text: text, completed: false });
     }
@@ -40,6 +44,7 @@ const toggleTaskComplete = (index) => {
         editingIndex = null;
         const taskInput = document.getElementById("taskInput");
         taskInput.value = "";
+        taskInput.placeholder = defaultPlaceholder;
         document.getElementById("newTask").textContent = "+";
     }
     updateTaskList();
@@ -53,6 +58,9 @@ const deleteTask = (index) => {
     if (editingIndex !== null) {
         // Reset editing state if current edit no longer makes sense
         editingIndex = null;
+        const taskInput = document.getElementById("taskInput");
+        taskInput.value = "";
+        taskInput.placeholder = defaultPlaceholder;
         document.getElementById("newTask").textContent = "+";
     }
     updateTaskList();
@@ -63,6 +71,7 @@ const deleteTask = (index) => {
 const editTask = (index) => {
     const taskInput = document.getElementById("taskInput");
     taskInput.value = task[index].text;
+    taskInput.placeholder = "Edit your task";
     editingIndex = index;
     document.getElementById("newTask").textContent = "✓";
 }
@@ -70,7 +79,7 @@ const editTask = (index) => {
 const updateStats = () => {
     const completeTasks = task.filter(task => task.completed).length;
     const totalTasks = task.length;
-    const progress = (completeTasks / totalTasks) * 100;
+    const progress = totalTasks === 0 ? 0 : (completeTasks / totalTasks) * 100;
     const progressBar = document.getElementById("progress");
 
     progressBar.style.width = `${progress}%`;
@@ -84,6 +93,14 @@ const updateStats = () => {
 const updateTaskList = () => {
     const taskList = document.getElementById("task-list");
     taskList.innerHTML = "";
+
+    if (task.length === 0) {
+        const emptyItem = document.createElement("li");
+        emptyItem.className = "empty-state";
+        emptyItem.textContent = "No tasks yet. Add your first task!";
+        taskList.append(emptyItem);
+        return;
+    }
 
     task.forEach((task, index) => {
         const listItem = document.createElement("li");
@@ -100,13 +117,14 @@ const updateTaskList = () => {
                                     ${editButtonHtml}
                   <img src="./img/bin.png" onclick="deleteTask(${index})"/>
                 </div>
-            </div
+            </div>
             `;
         listItem.addEventListener("change", () => toggleTaskComplete(index))
         taskList.append(listItem);
     });
 };
-document.getElementById("newTask").addEventListener("click", function (e) {
+const form = document.querySelector("form");
+form.addEventListener("submit", function (e) {
     e.preventDefault();
     addTask();
 });
