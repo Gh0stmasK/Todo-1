@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 let task = [];
+let editingIndex = null;
 
 const saveTasks = () => {
     localStorage.setItem("task", JSON.stringify(task));
@@ -16,18 +17,31 @@ const saveTasks = () => {
 const addTask = () => {
     const taskInput = document.getElementById("taskInput");
     const text = taskInput.value.trim();
-    if (text) {
+    if (!text) return;
+
+    if (editingIndex !== null) {
+        task[editingIndex].text = text;
+        editingIndex = null;
+        document.getElementById("newTask").textContent = "+";
+    } else {
         task.push({ text: text, completed: false });
-        taskInput.value = "";
-        updateTaskList();
-        updateStats();
-        saveTasks();
     }
+
+    taskInput.value = "";
+    updateTaskList();
+    updateStats();
+    saveTasks();
     // console.log(task);
 };
 
 const toggleTaskComplete = (index) => {
     task[index].completed = !task[index].completed;
+    if (editingIndex === index && task[index].completed) {
+        editingIndex = null;
+        const taskInput = document.getElementById("taskInput");
+        taskInput.value = "";
+        document.getElementById("newTask").textContent = "+";
+    }
     updateTaskList();
     updateStats();
     saveTasks();
@@ -36,6 +50,11 @@ const toggleTaskComplete = (index) => {
 
 const deleteTask = (index) => {
     task.splice(index, 1);
+    if (editingIndex !== null) {
+        // Reset editing state if current edit no longer makes sense
+        editingIndex = null;
+        document.getElementById("newTask").textContent = "+";
+    }
     updateTaskList();
     updateStats();
     saveTasks();
@@ -44,10 +63,8 @@ const deleteTask = (index) => {
 const editTask = (index) => {
     const taskInput = document.getElementById("taskInput");
     taskInput.value = task[index].text;
-    task.splice(index, 1);
-    updateTaskList();
-    updateStats();
-    saveTasks();
+    editingIndex = index;
+    document.getElementById("newTask").textContent = "✓";
 }
 
 const updateStats = () => {
@@ -70,6 +87,9 @@ const updateTaskList = () => {
 
     task.forEach((task, index) => {
         const listItem = document.createElement("li");
+        const editButtonHtml = task.completed
+            ? ""
+            : `<img src="./img/edit.png" onclick="editTask(${index})"/>`;
         listItem.innerHTML = `
             <div class="taskItem">
                 <div class="task ${task.completed ? "completed" : ""}">
@@ -77,7 +97,7 @@ const updateTaskList = () => {
                   <p>${task.text}</p>
                 </div>
                 <div>
-                  <img src="./img/edit.png" onclick="editTask(${index})"/>
+                                    ${editButtonHtml}
                   <img src="./img/bin.png" onclick="deleteTask(${index})"/>
                 </div>
             </div
